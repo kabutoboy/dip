@@ -6,7 +6,7 @@
 #include "PGMReader.hpp"
 
 void PGMReader::read(
-    std::istream s,
+    std::istream &s,
     std::function<void(std::vector<std::vector<char>>)> onComplete,
     std::function<void(std::string)> onError) {
   std::string header;
@@ -15,16 +15,16 @@ void PGMReader::read(
     onError("wrong header; given " + header);
     return;
   }
+
   unsigned width;
   unsigned height;
-  std::cin >> width;
-  std::cin >> height;
-  std::cout << "dimension is " << width << "x" << height << "\n";
+  s >> width;
+  s >> height;
 
   std::vector<std::vector<char>> image(height, std::vector<char>(width, 0));
   for (unsigned i = 0; i < height; i++) {
     for (unsigned j = 0; j < width; j++) {
-      std::cin >> image.at(i).at(j);
+      s >> image.at(i).at(j);
     }
   }
 
