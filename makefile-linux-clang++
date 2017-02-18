@@ -1,0 +1,33 @@
+# https://stackoverflow.com/questions/3774568/makefile-issue-smart-way-to-scan-directory-tree-for-c-files
+
+# Make does not offer a recursive wildcard function, so here's one:
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+
+# How to recursively find all files with the same name in a given folder
+# ALL_INDEX_HTMLS := $(call rwildcard,foo/,index.html)
+
+# How to recursively find all files that match a pattern
+# ALL_HTMLS := $(call rwildcard,foo/,*.html)
+
+HPP := $(call rwildcard,include/,*.hpp)
+SRC := $(call rwildcard,src/,*.cpp)
+OBJ = $(subst src,obj,$(subst .cpp,.o,$(SRC)))
+MY_SRC := $(call rwildcard,src/my/,*.cpp)
+MY_OBJ = $(subst src,obj,$(subst .cpp,.o,$(MY_SRC)))
+FIRST_OBJ := $(subst src,obj,$(subst .cpp,.o,$(wildcard src/*.cpp)))
+
+.PHONY : all
+
+all : $(OBJ)
+
+bin/main2D : obj/main2D.o obj/TimeSettings.o obj/Circle.o obj/Shape.o obj/Rectangle.o obj/CreateObject.o obj/Point.o obj/DeviceController.o
+	mkdir -p bin
+	clang++ -o "bin/main2D" obj/main2D.o obj/TimeSettings.o obj/Circle.o obj/Shape.o obj/Rectangle.o obj/CreateObject.o obj/Point.o obj/DeviceController.o -lGL -lGLU -lglut -std=c++14 -Wall
+
+bin/% : obj/%.o $(MY_OBJ)
+	mkdir -p $(dir $@)
+	clang++ -o "$@" $^ -lGL -lGLU -lglut -std=c++14 -Wall
+
+obj/%.o : src/%.cpp $(HPP)
+	mkdir -p $(dir $@)
+	clang++ -c -o "$@" "$<" -I"include" -std=c++14 -Wall

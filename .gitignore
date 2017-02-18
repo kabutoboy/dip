@@ -1,0 +1,14 @@
+# object files
+/obj
+
+# binary files
+/bin
+
+# Mac DS_Store Files
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+#makefile
+makefile
