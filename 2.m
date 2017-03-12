@@ -1,0 +1,11 @@
+I = imread("Cameraman.pgm");
+J = double(I) ./ 255;
+H1 = imhist(I);
+x = 0:1:255;
+plot(x, H1);
+J = histeq(I, 255);
+K = uint8(255 .* J);
+H2 = imhist(K);
+x = 0:1:255;
+plot(x, H2);
+imwrite(K, "Cameraman-eq.pgm");
