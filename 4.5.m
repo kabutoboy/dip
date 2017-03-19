@@ -1,10 +1,11 @@
 grid = imread("grid.pgm");
 distgrid = imread("distgrid.pgm");
-h = imhist(grid);
-x = 0:1:255;
-#plot(x, h)
 
-sigma_D = 0.05 * length(grid);
+scale = 2;
+
+I_src = imresize(distgrid, scale);
+I_dst = imresize(grid, scale);
+
 sigma_G = 4;
 
 kernel_size = 33;
@@ -21,8 +22,8 @@ F = zeros(kernel_size, kernel_size);
 for i = 1:size(G)(3)
   [Gix, Giy] = gradient(G(:,:,i));
   [Gixx, Gixy] = gradient(Gix);
-  Gixx45 = cos(45/180*pi)*Gixx + sin(45/180*pi)*Gixy;
-  Gixx315 = cos(315/180*pi)*Gixx + sin(315/180*pi)*Gixy;
+  Gixx45 = cos(45.0/180.0*pi)*Gixx + sin(45.0/180.0*pi)*Gixy;
+  Gixx315 = cos(315.0/180.0*pi)*Gixx + sin(315.0/180.0*pi)*Gixy;
   Gix /= norm(Gix, 1);
   Giy /= norm(Giy, 1);
   Gixx /= norm(Gixx, 1);
@@ -35,39 +36,50 @@ for i = 1:size(G)(3)
   F(:,:,i,5) = Gixx315;
 end
 
-imshow(0.25*((abs(min(min(F(:,:,4,5)))) + F(:,:,4,5)) / max(max(F(:,:,4,5)))));
+#imshow(0.25*((abs(min(min(F(:,:,4,5)))) + F(:,:,4,5)) / max(max(F(:,:,4,5)))));
 
-x_new = zeros(size(grid)(2));
-y_new = zeros(size(grid)(1));
-
-function y = rho(x, sigma)
-  y = log(1 + 0.5 * (x/sigma)**2);
+feature_field_src = zeros(size(I_src)(1), size(I_src)(2));
+feature_field_dst = zeros(size(I_dst)(1), size(I_dst)(2));
+for i = 1:size(F)(3)
+  for j = 1:size(F)(4)
+    feature_field_src(:,:,i,j) = imfilter(I_src, F(:,:,i,j), 'conv');
+    feature_field_dst(:,:,i,j) = imfilter(I_dst, F(:,:,i,j), 'conv');
+  end
 end
 
-I_src = distgrid;
-I_dst = grid;
+x_new = 1:1:(size(I_src)(2));
+y_new = 1:1:(size(I_dst)(1));
+
+function y = rho(x, s)
+  y = log(1 + 0.5 * ((x/s)**2));
+end
+
+sigma_D = 0.05 * length(I_src);
 epsilon_D_squared = 0;
 for i = 1:size(I_src)(1)
   for j = 1:size(I_src)(2)
     for k = 1:size(F)(3)
       for l = 1:size(F)(4)
-        J_src = imfilter(I_src, F(:,:,k,l), 'conv');
-        J_dst = imfilter(I_dst, F(:,:,k,l), 'conv');
-        epsilon_D_squared += rho_D(J_src(i,j) - J_dst(x_new(i), y_new(j)), sigma);
+        #J_src = imfilter(I_src, F(:,:,k,l), 'conv');
+        #J_dst = imfilter(I_dst, F(:,:,k,l), 'conv');
+        epsilon_D_squared +=...
+          rho(...
+            feature_field_src(i, j, k, l)...
+            - feature_field_dst(y_new(i), x_new(j), k, l)...
+            , sigma_D);
       end
     end
   end 
 end
-
+#{
+sigma_S = 10;
+x_new_d = gradient(x_new);
+y_new_d = gradient(y_new);
 epsilon_S_squared = 0;
 for i = 1:size(I_src)(1)
   for j = 1:size(I_src)(2)
-    for k = 1:size(F)(3)
-      for l = 1:size(F)(4)
-        J_src = imfilter(I_src, F(:,:,k,l), 'conv');
-        J_dst = imfilter(I_dst, F(:,:,k,l), 'conv');
-        epsilon_D_squared += rho_D(J_src(i,j) - J_dst(x_new(i), y_new(j)), sigma);
-      end
-    end
+    epsilon_S_squared = rho(y_new_d_(i), sigma_S) + rho(x_new_d(j), sigma_S);
   end 
 end
+#}
+alpha_squared = 0.5;
