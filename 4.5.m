@@ -7,10 +7,10 @@ scale = 2;
 I_src = imresize(distgrid, scale);
 I_dst = imresize(grid, scale);
 
-sigma_G = 4;
+sigma_G = 2;
 
 waitbar(0.1, wb, 'Creating filters...');
-kernel_size = 33;
+kernel_size = 17;
 G1 = fspecial("gaussian", kernel_size, sigma_G/8);
 G2 = fspecial("gaussian", kernel_size, sigma_G/4);
 G3 = fspecial("gaussian", kernel_size, sigma_G/2);
