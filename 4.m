@@ -54,6 +54,6 @@ labeled = labelmatrix(cc);
 RGB_label = label2rgb(labeled, @copper, 'c', 'shuffle');
 #imshow(RGB_label,'InitialMagnification','fit')
 #G2 = bwmorph(G2, "branchpoints");
-imwrite(G1, "grid-med.pgm");
-imwrite(G2, "distgrid-med.pgm");
+#imwrite(G1, "grid-med.pgm");
+#imwrite(G2, "distgrid-med.pgm");
 #imshow(bitand(lX, lY));
