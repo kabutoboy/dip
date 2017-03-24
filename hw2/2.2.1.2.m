@@ -1,5 +1,5 @@
-I = imread("Lenna_noise.pgm");
-K = imread("Lenna.pgm");
+I = imread("Chess_noise.pgm");
+K = imread("Chess.pgm");
 subplot(3, 6, 1);
 imshow(I);
 subplot(3, 6, 2);

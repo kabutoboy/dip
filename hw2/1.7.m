@@ -3,7 +3,7 @@ F = fft2(I, 256, 256);
 G = fspecial("gaussian", 9, 2);
 H = fft2(G, 256, 256);
 J1 = imfilter(I, G, "conv");
-J2 = real(ifft2(F));
+J2 = uint8(real(ifft2(F .* H)));
 subplot(1, 2, 1);
 imshow(J1);
 subplot(1, 2, 2);
