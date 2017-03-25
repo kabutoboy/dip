@@ -25,6 +25,7 @@ for d = 1:length(peaks)
     continue;
   end
   d0 = d-1;
+  fprintf("peak at %d\n", d0);
   f = (d0-thresh <= I & I <= d0+thresh);
   CC = bwconncomp(f);
   numPixels = cellfun(@numel,CC.PixelIdxList);
